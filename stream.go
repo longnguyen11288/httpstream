@@ -31,6 +31,8 @@ var (
 	siteStreamURL, _ = url.Parse("https://sitestream.twitter.com/2b/site.json")
 	retryTimeout     = time.Second * 10
 	OauthCon         *oauth.Consumer
+
+	ErrStaleConnection = errors.New("stale connection")
 )
 
 func init() {
@@ -71,7 +73,7 @@ func (conn *streamConn) Close() {
 
 func basicauthConnect(conn *streamConn) (*http.Response, error) {
 	if conn.stale {
-		return nil, errors.New("Stale connection")
+		return nil, ErrStaleConnection
 	}
 
 	conn.client = &http.Client{}
@@ -110,7 +112,7 @@ func basicauthConnect(conn *streamConn) (*http.Response, error) {
 
 func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, error) {
 	if conn.stale {
-		return nil, errors.New("Stale connection")
+		return nil, ErrStaleConnection
 	}
 
 	resp, err := OauthCon.Post(conn.url.String(), params, conn.at)
