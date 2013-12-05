@@ -51,14 +51,13 @@ type streamConn struct {
 	connect func() (*http.Response, error)
 }
 
+// NewStreamConn creates a new stream connection.
 func NewStreamConn(max int) streamConn {
 	return streamConn{wait: 1, maxWait: max}
 }
 
-//type StreamHandler func([]byte)
-
+// Connect will mark the connection as stale, and let the connect() handler close after a read.
 func (conn *streamConn) Close() {
-	// Just mark the connection as stale, and let the connect() handler close after a read
 	conn.stale = true
 	conn.closed = true
 	if conn.resp != nil {
@@ -66,7 +65,8 @@ func (conn *streamConn) Close() {
 	}
 }
 
-func basicauthConnect(conn *streamConn) (resp *http.Response, err error) {
+// Connect using basic auth.
+func (conn *streamConn) basicauthConnect() (resp *http.Response, err error) {
 	if conn.stale {
 		err = ErrStaleConnection
 		return
@@ -103,7 +103,8 @@ func basicauthConnect(conn *streamConn) (resp *http.Response, err error) {
 	return
 }
 
-func oauthConnect(conn *streamConn, params map[string]string) (resp *http.Response, err error) {
+// Connect using OAuth.
+func (conn *streamConn) oauthConnect(params map[string]string) (resp *http.Response, err error) {
 	if conn.stale {
 		err = ErrStaleConnection
 		return
@@ -269,13 +270,13 @@ func (c *Client) Connect(url_ *url.URL, params map[string]string, done chan bool
 		sc.postData = formString(params)
 		sc.authData = "Basic " + encodedAuth(c.Username, c.Password)
 		sc.connect = func() (*http.Response, error) {
-			return basicauthConnect(&sc)
+			return sc.basicauthConnect()
 		}
 
 	} else {
 		sc.at = c.at
 		sc.connect = func() (*http.Response, error) {
-			return oauthConnect(&sc, params)
+			return sc.oauthConnect(params)
 		}
 
 	}
@@ -346,14 +347,14 @@ func (c *Client) Filter(userids []int64, topics []string, languages []string, lo
 	}
 
 	if watchStalls {
-		c.Handler = StallWatcher(c.Handler)
+		c.Handler = stallWatcher(c.Handler)
 	}
 
 	return c.Connect(filterURL, params, done)
 }
 
-// a handler wrapper to watch for twitter stall warnings
-func StallWatcher(handler func([]byte)) func([]byte) {
+// A handler wrapper to watch for twitter stall wardings.
+func stallWatcher(handler func([]byte)) func([]byte) {
 	/*
 		{ "warning":{
 			"code":"FALLING_BEHIND",
@@ -375,17 +376,19 @@ func StallWatcher(handler func([]byte)) func([]byte) {
 	}
 }
 
-// twitter sample stream
+// Sample connects to the Twitter Sample stream.
+// https://dev.twitter.com/docs/api/1.1/get/statuses/sample
 func (c *Client) Sample(done chan bool) error {
 	return c.Connect(sampleURL, nil, done)
 }
 
-// Track User tweets and events, uses passed username/pwd
+// User connects to the Twitter User stream.
+// https://dev.twitter.com/docs/streaming-apis/streams/user
 func (c *Client) User(done chan bool) error {
 	return c.Connect(userURL, nil, done)
 }
 
-// Close the client
+// Close closes the client.
 func (c *Client) Close() {
 	//has it already been closed?
 	if c.conn == nil || c.conn.stale {
