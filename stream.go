@@ -130,14 +130,11 @@ func oauthConnect(conn *streamConn, params map[string]string) (resp *http.Respon
 }
 
 func formString(params map[string]string) string {
-	var body bytes.Buffer
+	var vals url.Values
 	for k, v := range params {
-		body.WriteString(URLEscape(k))
-		body.WriteString("=")
-		body.WriteString(URLEscape(v))
-		body.WriteString("&")
+		vals.Add(k, v)
 	}
-	return body.String()
+	return vals.Encode()
 }
 
 func (conn *streamConn) readStream(resp *http.Response, handler func([]byte), uniqueID string, done chan bool) {
