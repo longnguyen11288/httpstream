@@ -25,11 +25,11 @@ import (
 )
 
 var (
-	filterURL, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
-	sampleURL, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
-	userURL, _                     = url.Parse("https://userstream.twitter.com/2/user.json")
-	siteStreamURL, _               = url.Parse("https://sitestream.twitter.com/2b/site.json")
-	retryTimeout     time.Duration = time.Second * 10
+	filterURL, _     = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
+	sampleURL, _     = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
+	userURL, _       = url.Parse("https://userstream.twitter.com/2/user.json")
+	siteStreamURL, _ = url.Parse("https://sitestream.twitter.com/2b/site.json")
+	retryTimeout     = time.Second * 10
 	OauthCon         *oauth.Consumer
 )
 

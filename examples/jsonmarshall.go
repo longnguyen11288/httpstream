@@ -12,10 +12,10 @@ import (
 )
 
 var (
-	pwd      *string = flag.String("pwd", "password", "Twitter Password")
-	user     *string = flag.String("user", "username", "Twitter username")
-	track    *string = flag.String("track", "", "Twitter terms to track")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	pwd      = flag.String("pwd", "password", "Twitter Password")
+	user     = flag.String("user", "username", "Twitter username")
+	track    = flag.String("track", "", "Twitter terms to track")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func printPretty(tweet *httpstream.Tweet) {

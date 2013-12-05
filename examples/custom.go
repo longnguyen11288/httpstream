@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	pwd          *string = flag.String("pwd", "password", "Password")
-	user         *string = flag.String("user", "username", "username")
-	track        *string = flag.String("track", "", "Twitter terms to track")
-	logLevel     *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
-	customURL, _         = url.Parse("http://localhost:6767/stream")
+	pwd          = flag.String("pwd", "password", "Password")
+	user         = flag.String("user", "username", "username")
+	track        = flag.String("track", "", "Twitter terms to track")
+	logLevel     = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	customURL, _ = url.Parse("http://localhost:6767/stream")
 )
 
 func main() {

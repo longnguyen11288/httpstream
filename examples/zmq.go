@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	pwd      *string = flag.String("pwd", "password", "Password")
-	user     *string = flag.String("user", "username", "username")
-	sink     *string = flag.String("sink", "tcp://*:8888", "Zmq address to connect to:   ")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	pwd      = flag.String("pwd", "password", "Password")
+	user     = flag.String("user", "username", "username")
+	sink     = flag.String("sink", "tcp://*:8888", "Zmq address to connect to:   ")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func main() {

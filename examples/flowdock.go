@@ -16,9 +16,9 @@ import (
 )
 
 var (
-	token    *string = flag.String("token", "password", "Password")
-	flow     *string = flag.String("flow", "yourorg/flow", "Flowdock url path:  organization/flow")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	token    = flag.String("token", "password", "Password")
+	flow     = flag.String("flow", "yourorg/flow", "Flowdock url path:  organization/flow")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func main() {

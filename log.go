@@ -14,9 +14,9 @@ const (
 )
 
 var (
-	LogLevel      int = ERROR
+	LogLevel      = ERROR
 	logger        *log.Logger
-	LogLevelWords map[string]int = map[string]int{"fatal": 0, "error": 1, "warn": 2, "info": 3, "debug": 4, "none": -1}
+	LogLevelWords = map[string]int{"fatal": 0, "error": 1, "warn": 2, "info": 3, "debug": 4, "none": -1}
 )
 
 // set the logger to use, normal usage:

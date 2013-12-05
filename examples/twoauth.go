@@ -13,15 +13,15 @@ import (
 )
 
 var (
-	maxCt    *int    = flag.Int("maxct", 10, "Max # of messages")
-	user     *string = flag.String("user", "", "twitter username")
-	ck       *string = flag.String("ck", "", "Consumer Key")
-	cs       *string = flag.String("cs", "", "Consumer Secret")
-	ot       *string = flag.String("ot", "", "Oauth Token")
-	osec     *string = flag.String("os", "", "OAuthTokenSecret")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
-	search   *string = flag.String("search", "android,golang,zeromq,javascript", "keywords to search for, comma delimtted")
-	users    *string = flag.String("users", "", "list of twitter userids to filter for, comma delimtted")
+	maxCt    = flag.Int("maxct", 10, "Max # of messages")
+	user     = flag.String("user", "", "twitter username")
+	ck       = flag.String("ck", "", "Consumer Key")
+	cs       = flag.String("cs", "", "Consumer Secret")
+	ot       = flag.String("ot", "", "Oauth Token")
+	osec     = flag.String("os", "", "OAuthTokenSecret")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	search   = flag.String("search", "android,golang,zeromq,javascript", "keywords to search for, comma delimtted")
+	users    = flag.String("users", "", "list of twitter userids to filter for, comma delimtted")
 )
 
 func main() {

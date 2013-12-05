@@ -9,12 +9,12 @@ import (
 )
 
 var (
-	pwd       *string = flag.String("pwd", "password", "Password")
-	user      *string = flag.String("user", "username", "username")
-	track     *string = flag.String("track", "", "Twitter terms to track")
-	locations *string = flag.String("locations", "", "Pass the locations filtering, comma delimitted")
-	words     *string = flag.String("keywords", "", "List of keywords to search")
-	logLevel  *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	pwd       = flag.String("pwd", "password", "Password")
+	user      = flag.String("user", "username", "username")
+	track     = flag.String("track", "", "Twitter terms to track")
+	locations = flag.String("locations", "", "Pass the locations filtering, comma delimitted")
+	words     = flag.String("keywords", "", "List of keywords to search")
+	logLevel  = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func main() {
