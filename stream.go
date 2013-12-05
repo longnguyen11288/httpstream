@@ -14,7 +14,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"github.com/mrjones/oauth"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -88,7 +87,7 @@ func basicauthConnect(conn *streamConn) (*http.Response, error) {
 
 	if conn.postData != "" {
 		req.Method = "POST"
-		req.Body = nopCloser{bytes.NewBufferString(conn.postData)}
+		req.Body = ioutil.NopCloser(bytes.NewBufferString(conn.postData))
 		req.ContentLength = int64(len(conn.postData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
@@ -211,18 +210,6 @@ func encodedAuth(user, pwd string) string {
 	encoder.Write([]byte(user + ":" + pwd))
 	encoder.Close()
 	return buf.String()
-}
-
-type nopCloser struct {
-	io.Reader
-}
-
-func (nopCloser) Close() error {
-	return nil
-}
-
-func getNopCloser(buf *bytes.Buffer) nopCloser {
-	return nopCloser{buf}
 }
 
 // Client for connecting
