@@ -25,10 +25,10 @@ import (
 )
 
 var (
-	filterUrl, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
-	sampleUrl, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
-	userUrl, _                     = url.Parse("https://userstream.twitter.com/2/user.json")
-	siteStreamUrl, _               = url.Parse("https://sitestream.twitter.com/2b/site.json")
+	filterURL, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
+	sampleURL, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
+	userURL, _                     = url.Parse("https://userstream.twitter.com/2/user.json")
+	siteStreamURL, _               = url.Parse("https://sitestream.twitter.com/2b/site.json")
 	retryTimeout     time.Duration = time.Second * 10
 	OauthCon         *oauth.Consumer
 )
@@ -146,7 +146,7 @@ func formString(params map[string]string) string {
 	return body.String()
 }
 
-func (conn *streamConn) readStream(resp *http.Response, handler func([]byte), uniqueId string, done chan bool) {
+func (conn *streamConn) readStream(resp *http.Response, handler func([]byte), uniqueID string, done chan bool) {
 
 	var reader *bufio.Reader
 	reader = bufio.NewReader(resp.Body)
@@ -370,7 +370,7 @@ func (c *Client) Filter(userids []int64, topics []string, languages []string, lo
 		c.Handler = StallWatcher(c.Handler)
 	}
 
-	return c.Connect(filterUrl, params, done)
+	return c.Connect(filterURL, params, done)
 }
 
 // a handler wrapper to watch for twitter stall warnings
@@ -398,12 +398,12 @@ func StallWatcher(handler func([]byte)) func([]byte) {
 
 // twitter sample stream
 func (c *Client) Sample(done chan bool) error {
-	return c.Connect(sampleUrl, nil, done)
+	return c.Connect(sampleURL, nil, done)
 }
 
 // Track User tweets and events, uses passed username/pwd
 func (c *Client) User(done chan bool) error {
-	return c.Connect(userUrl, nil, done)
+	return c.Connect(userURL, nil, done)
 }
 
 // Close the client

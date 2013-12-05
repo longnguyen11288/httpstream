@@ -17,10 +17,10 @@ var (
 
 func init() {
 	SetLogger(log.New(os.Stdout, "", log.Ltime|log.Lshortfile), "debug")
-	loadJsonData()
+	loadJSONData()
 }
 
-func loadJsonData() {
+func loadJSONData() {
 	// load the tweet data
 	if jsonb, err := ioutil.ReadFile("data/testdata.json"); err == nil {
 		parts := bytes.Split(jsonb, []byte("\n\n"))
@@ -29,7 +29,7 @@ func loadJsonData() {
 		}
 	}
 }
-func prettyJson(js string) {
+func prettyJSON(js string) {
 	m := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(js), &m); err == nil {
 		if b, er := json.MarshalIndent(m, "", "  "); er == nil {
@@ -78,15 +78,15 @@ func TestDecodeTweet1Test(t *testing.T) {
 	}
 	/*
 		twx := twlist[1]
-		for _, url := range twx.Urls() {
+		for _, url := range twx.URLs() {
 			Debug(url)
 		}
 		twx = twlist[1]
-		u := twx.Entities.Urls[0]
-		log.Println(twx.Urls())
-		log.Println(u.Expanded_url)
+		u := twx.Entities.URLs[0]
+		log.Println(twx.URLs())
+		log.Println(u.ExpandedURL)
 	*/
-	//prettyJson(tweet3)
+	//prettyJSON(tweet3)
 	//tw2 := twitter.Tweet{}
 	//err = json.Unmarshal([]byte(tweet2), &tw2)
 	//log.Println(err)

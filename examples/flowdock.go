@@ -29,7 +29,7 @@ func main() {
 	stream := make(chan []byte, 200)
 	done := make(chan bool)
 
-	flowUrl, _ := url.Parse("https://" + *token + "@stream.flowdock.com/flows?filter=" + *flow)
+	flowURL, _ := url.Parse("https://" + *token + "@stream.flowdock.com/flows?filter=" + *flow)
 
 	// set the logger and log level
 	SetLogger(log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile), *logLevel)
@@ -38,7 +38,7 @@ func main() {
 	client := NewClient(func(line []byte) {
 		stream <- line
 	})
-	_ = client.Connect(flowUrl, nil, done)
+	_ = client.Connect(flowURL, nil, done)
 
 	for {
 		evt := <-stream

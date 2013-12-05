@@ -46,7 +46,7 @@ func main() {
 	}
 
 	//at := goauthcon.GetAccessToken(rt.Token, pin)
-	at := oauth.AccessToken{Id: "",
+	at := oauth.AccessToken{ID: "",
 		Token:    *ot,
 		Secret:   *osec,
 		UserRef:  *user,
@@ -65,17 +65,17 @@ func main() {
 	}))
 
 	// find list of userids we are going to search for
-	userIds := make([]int64, 0)
-	for _, userId := range strings.Split(*users, ",") {
-		if id, err := strconv.ParseInt(userId, 10, 64); err == nil {
-			userIds = append(userIds, id)
+	userIDs := make([]int64, 0)
+	for _, userID := range strings.Split(*users, ",") {
+		if id, err := strconv.ParseInt(userID, 10, 64); err == nil {
+			userIDs = append(userIDs, id)
 		}
 	}
 	var keywords []string
 	if search != nil && len(*search) > 0 {
 		keywords = strings.Split(*search, ",")
 	}
-	err := client.Filter(userIds, keywords, []string{"en"}, nil, false, done)
+	err := client.Filter(userIDs, keywords, []string{"en"}, nil, false, done)
 	if err != nil {
 		httpstream.Log(httpstream.ERROR, err.Error())
 	} else {

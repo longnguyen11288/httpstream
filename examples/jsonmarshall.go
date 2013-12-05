@@ -22,7 +22,7 @@ func printPretty(tweet *httpstream.Tweet) {
 	b, err := json.MarshalIndent(tweet, " ", "   ")
 	if err == nil && tweet.Place != nil {
 		println(string(b))
-		//log.Println(tweet.Urls())
+		//log.Println(tweet.URLs())
 	}
 }
 func printPrettyBytes(line []byte) {
@@ -52,7 +52,7 @@ func HandleLine(th int, line []byte) {
 		json.Unmarshal(line, &tweet)
 		printPretty(&tweet)
 		//if tweet.Coordinates != nil {
-		//println(th, " ", tweet.User.Screen_name, ": ", tweet.Text)
+		//println(th, " ", tweet.User.ScreenName, ": ", tweet.Text)
 		//	printPretty(tweet)
 		//}
 	}

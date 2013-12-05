@@ -13,7 +13,7 @@ var (
 	user         *string = flag.String("user", "username", "username")
 	track        *string = flag.String("track", "", "Twitter terms to track")
 	logLevel     *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
-	customUrl, _         = url.Parse("http://localhost:6767/stream")
+	customURL, _         = url.Parse("http://localhost:6767/stream")
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	})
 	client.MaxWait = 20
 
-	err := client.Connect(customUrl, nil, done)
+	err := client.Connect(customURL, nil, done)
 	if err != nil {
 		println(err.Error())
 	} else {

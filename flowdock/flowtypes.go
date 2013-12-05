@@ -38,7 +38,7 @@ type Event struct {
 	Event   string
 	Tags    []string
 	Uuid    string
-	Id      int
+	ID      int
 	Flow    string
 	Content interface{}
 }
