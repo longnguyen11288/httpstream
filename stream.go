@@ -25,7 +25,6 @@ var (
 	userURL, _       = url.Parse("https://userstream.twitter.com/2/user.json")
 	siteStreamURL, _ = url.Parse("https://sitestream.twitter.com/2b/site.json")
 	retryTimeout     = time.Second * 10
-	OauthCon         *oauth.Consumer
 
 	ErrStaleConnection = errors.New("stale connection")
 )
@@ -35,14 +34,15 @@ func init() {
 }
 
 type streamConn struct {
-	client   *http.Client
-	resp     *http.Response
-	url      *url.URL
-	at       *oauth.AccessToken
-	authData string
-	postData string
-	stale    bool
-	closed   bool
+	c           *Client
+	client      *http.Client
+	resp        *http.Response
+	url         *url.URL
+	accessToken *oauth.AccessToken
+	authData    string
+	postData    string
+	stale       bool
+	closed      bool
 	// wait time before trying to reconnect, this will be
 	// exponentially moved up until reaching maxWait, when
 	// it will exit
@@ -106,7 +106,7 @@ func (conn *streamConn) oauthConnect(params map[string]string) (resp *http.Respo
 		return
 	}
 
-	if resp, err = OauthCon.Post(conn.url.String(), params, conn.at); err != nil {
+	if resp, err = conn.c.consumer.Post(conn.url.String(), params, conn.accessToken); err != nil {
 		if resp != nil && resp.Body != nil {
 			data, _ := ioutil.ReadAll(resp.Body)
 			Log(ERROR, err, " ", string(data))
@@ -204,11 +204,12 @@ type Client struct {
 	Username string
 	Password string
 	// unique id for this connection
-	Uniqueid string
-	conn     *streamConn
-	MaxWait  int
-	at       *oauth.AccessToken
-	Handler  func([]byte)
+	Uniqueid    string
+	conn        *streamConn
+	consumer    *oauth.Consumer
+	MaxWait     int
+	accessToken *oauth.AccessToken
+	Handler     func([]byte)
 }
 
 func NewClient(handler func([]byte)) *Client {
@@ -218,11 +219,11 @@ func NewClient(handler func([]byte)) *Client {
 	}
 }
 
-func NewOAuthClient(at *oauth.AccessToken, handler func([]byte)) *Client {
+func NewOAuthClient(token *oauth.AccessToken, handler func([]byte)) *Client {
 	return &Client{
-		at:      at,
-		Handler: handler,
-		MaxWait: 300,
+		accessToken: token,
+		Handler:     handler,
+		MaxWait:     300,
 	}
 }
 
@@ -270,7 +271,7 @@ func (c *Client) Connect(url_ *url.URL, params map[string]string, done chan bool
 		}
 
 	} else {
-		sc.at = c.at
+		sc.accessToken = c.accessToken
 		sc.connect = func() (*http.Response, error) {
 			return sc.oauthConnect(params)
 		}
