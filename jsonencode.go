@@ -158,32 +158,32 @@ func UnquoteBytes(s []byte) (t []byte, ok bool) {
 
 type Int64Nullable int64
 
-func (i *Int64Nullable) UnmarshalJSON(data []byte) error {
+func (i *Int64Nullable) UnmarshalJSON(data []byte) (err error) {
 	if len(data) == 0 || string(data) == "null" {
-		return nil
+		return
 	}
 
-	if in, err := strconv.ParseInt(string(data), 10, 64); err != nil {
-		return err
-	} else {
-		*i = Int64Nullable(in)
+	in, err := strconv.ParseInt(string(data), 10, 64)
+	if err != nil {
+		return
 	}
-	return nil
+	*i = Int64Nullable(in)
+	return
 }
 
 type IntNullable int
 
-func (i *IntNullable) UnmarshalJSON(data []byte) error {
+func (i *IntNullable) UnmarshalJSON(data []byte) (err error) {
 	if len(data) == 0 || string(data) == "null" {
-		return nil
+		return
 	}
 
-	if in, err := strconv.ParseInt(string(data), 10, 32); err != nil {
-		return err
-	} else {
-		*i = IntNullable(in)
+	in, err := strconv.ParseInt(string(data), 10, 32)
+	if err != nil {
+		return
 	}
-	return nil
+	*i = IntNullable(in)
+	return
 }
 
 type StringNullable string
@@ -200,15 +200,15 @@ func (s *StringNullable) UnmarshalJSON(data []byte) error {
 
 type BoolNullable bool
 
-func (b *BoolNullable) UnmarshalJSON(data []byte) error {
+func (b *BoolNullable) UnmarshalJSON(data []byte) (err error) {
 	if len(data) == 0 || string(data) == "null" {
-		return nil
+		return
 	}
 
-	if bo, err := strconv.ParseBool(string(data)); err != nil {
-		return err
-	} else {
-		*b = BoolNullable(bo)
+	bo, err := strconv.ParseBool(string(data))
+	if err != nil {
+		return
 	}
-	return nil
+	*b = BoolNullable(bo)
+	return
 }
