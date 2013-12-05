@@ -35,7 +35,7 @@ There is a periodic heartbeat per user it looks like
 
 */
 
-type struct Event {
+type Event struct {
 	// "mail", "activity.user",
 	Event       string   
 	Tags        []string
