@@ -31,7 +31,7 @@ func main() {
 		stream <- line
 		// although you can do heavy lifting here, it means you are doing all
 		// your work in the same thread as the http streaming/listener
-		// by using a go channel, you can send the work to a 
+		// by using a go channel, you can send the work to a
 		// different thread/goroutine
 	}))
 
