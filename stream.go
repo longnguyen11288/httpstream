@@ -74,23 +74,19 @@ func (conn *streamConn) basicauthConnect() (resp *http.Response, err error) {
 
 	conn.client = &http.Client{}
 
-	var req http.Request
-	req.URL = conn.url
-	req.Method = "GET"
-	req.Header = http.Header{}
+	req, _ := http.NewRequest("GET", conn.url.String(), nil)
 	if conn.authData != "" {
 		req.Header.Set("Authorization", conn.authData)
 	}
 
 	if conn.postData != "" {
-		req.Method = "POST"
-		req.Body = ioutil.NopCloser(bytes.NewBufferString(conn.postData))
+		req, _ = http.NewRequest("POST", conn.url.String(), bytes.NewBufferString(conn.postData))
 		req.ContentLength = int64(len(conn.postData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	Debug(req.Header)
 	Debug(conn.postData)
-	if resp, err = conn.client.Do(&req); err != nil {
+	if resp, err = conn.client.Do(req); err != nil {
 		Log(ERROR, "Could not Connect to Stream: ", err)
 		return
 	}
