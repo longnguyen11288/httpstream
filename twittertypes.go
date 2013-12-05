@@ -1,9 +1,9 @@
 package httpstream
 
 import (
-	"bytes"
 	//"encoding/json"
 	"net/url"
+	"regexp"
 )
 
 type User struct {
@@ -245,9 +245,9 @@ The twitter stream contains non-tweets (deletes)
 */
 // a function to filter out the delete messages
 func OnlyTweetsFilter(handler func([]byte)) func([]byte) {
-	delTw := []byte(`{"delete"`)
+	delTw := regexp.MustCompile(`"delete"`)
 	return func(line []byte) {
-		if !bytes.HasPrefix(line, delTw) {
+		if delTw.Find(line) != nil {
 			handler(line)
 		}
 	}
