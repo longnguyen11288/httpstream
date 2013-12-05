@@ -201,17 +201,17 @@ type Mention struct {
 }
 
 type Media struct {
-	ID             int64
-	IDStr          string
-	DisplayURL     string
-	ExpandedURL    string
-	Indices        []int
-	MediaURL       string
-	MediaURL_https string
-	URL            string
-	Type           string
-	ScreenName     string
-	Sizes          Sizes
+	ID            int64
+	IDStr         string
+	DisplayURL    string
+	ExpandedURL   string
+	Indices       []int
+	MediaURL      string
+	MediaURLHTTPS string
+	URL           string
+	Type          string
+	ScreenName    string
+	Sizes         Sizes
 }
 
 type Sizes struct {
