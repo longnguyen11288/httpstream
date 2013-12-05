@@ -245,7 +245,7 @@ The twitter stream contains non-tweets (deletes)
 */
 // a function to filter out the delete messages
 func OnlyTweetsFilter(handler func([]byte)) func([]byte) {
-	delTw := regexp.MustCompile(`"delete"`)
+	delTw := regexp.MustCompile(`{"delete":`)
 	return func(line []byte) {
 		if delTw.Find(line) != nil {
 			handler(line)
