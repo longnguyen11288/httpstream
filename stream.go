@@ -66,9 +66,10 @@ func (conn *streamConn) Close() {
 	}
 }
 
-func basicauthConnect(conn *streamConn) (*http.Response, error) {
+func basicauthConnect(conn *streamConn) (resp *http.Response, err error) {
 	if conn.stale {
-		return nil, ErrStaleConnection
+		err = ErrStaleConnection
+		return
 	}
 
 	conn.client = &http.Client{}
@@ -89,20 +90,17 @@ func basicauthConnect(conn *streamConn) (*http.Response, error) {
 	}
 	Debug(req.Header)
 	Debug(conn.postData)
-	resp, err := conn.client.Do(&req)
-
-	if err != nil {
+	if resp, err = conn.client.Do(&req); err != nil {
 		Log(ERROR, "Could not Connect to Stream: ", err)
-		return nil, err
-	} else {
-		Debugf("connected to %s \n\thttp status = %v", conn.url, resp.Status)
-		Debug(resp.Header)
-		for n, v := range resp.Header {
-			Debug(n, v[0])
-		}
+		return
+	}
+	Debugf("connected to %s \n\thttp status = %v", conn.url, resp.Status)
+	Debug(resp.Header)
+	for n, v := range resp.Header {
+		Debug(n, v[0])
 	}
 
-	return resp, nil
+	return
 }
 
 func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, error) {
