@@ -1,11 +1,7 @@
-/*
-A Go http streaming client. http-streaming is most-associated with the twitter stream api.
-This client works with twitter, but has also been tested against the data-sift stream and
-flowdock stream api's
-
-httpstream was forked from https://github.com/hoisie/twitterstream
-
-*/
+// Package httpstream provides a generic HTTP streaming client.
+// HTTP streaming is most associated with the Twitter Stream API.
+// This client works with Twitter, but has also been tested against the data-sift stream
+// and flowdock stream APIs.
 package httpstream
 
 import (
