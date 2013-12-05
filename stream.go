@@ -103,14 +103,13 @@ func basicauthConnect(conn *streamConn) (resp *http.Response, err error) {
 	return
 }
 
-func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, error) {
+func oauthConnect(conn *streamConn, params map[string]string) (resp *http.Response, err error) {
 	if conn.stale {
-		return nil, ErrStaleConnection
+		err = ErrStaleConnection
+		return
 	}
 
-	resp, err := OauthCon.Post(conn.url.String(), params, conn.at)
-
-	if err != nil {
+	if resp, err = OauthCon.Post(conn.url.String(), params, conn.at); err != nil {
 		if resp != nil && resp.Body != nil {
 			data, _ := ioutil.ReadAll(resp.Body)
 			Log(ERROR, err, " ", string(data))
@@ -127,7 +126,7 @@ func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, e
 		}
 	}
 
-	return resp, nil
+	return
 }
 
 func formString(params map[string]string) string {
