@@ -4,7 +4,7 @@ package main
 
 import (
 	"flag"
-	"github.com/araddon/httpstream"
+	"github.com/attilaolah/httpstream"
 	"github.com/mrjones/oauth"
 	"log"
 	"os"
@@ -34,16 +34,15 @@ func main() {
 	stream := make(chan []byte, 1000)
 	done := make(chan bool)
 
-	httpstream.OauthCon = &oauth.Consumer{
-		Service:          "twitter",
-		RequestTokenURL:  "http://twitter.com/oauth/request_token",
-		AccessTokenURL:   "http://twitter.com/oauth/access_token",
-		AuthorizationURL: "http://twitter.com/oauth/authorize",
-		ConsumerKey:      *ck,
-		ConsumerSecret:   *cs,
-		CallBackURL:      "oob",
-		UserAgent:        "go/httpstream",
-	}
+	httpstream.OauthCon = oauth.NewConsumer(
+		*ck,
+		*cs,
+		oauth.ServiceProvider{
+			RequestTokenUrl: "http://twitter.com/oauth/request_token",
+			AuthorizeTokenUrl: "http://twitter.com/oauth/authorize",
+			AccessTokenUrl: "http://twitter.com/oauth/access_token",
+		},
+	)
 
 	//at := goauthcon.GetAccessToken(rt.Token, pin)
 	at := oauth.AccessToken{ID: "",
