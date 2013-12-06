@@ -34,7 +34,7 @@ func main() {
 	stream := make(chan []byte, 1000)
 	done := make(chan bool)
 
-	httpstream.OauthCon = oauth.NewConsumer(
+	c := oauth.NewConsumer(
 		*ck,
 		*cs,
 		oauth.ServiceProvider{
@@ -55,7 +55,7 @@ func main() {
 	// the stream listener effectively operates in one "thread"/goroutine
 	// as the httpstream Client processes inside a go routine it opens
 	// That includes the handler func we pass in here
-	client := httpstream.NewOAuthClient(&at, httpstream.OnlyTweetsFilter(func(line []byte) {
+	client := httpstream.NewOAuthClient(c, &at, httpstream.OnlyTweetsFilter(func(line []byte) {
 		stream <- line
 		// although you can do heavy lifting here, it means you are doing all
 		// your work in the same thread as the http streaming/listener

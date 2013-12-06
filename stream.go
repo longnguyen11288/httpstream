@@ -219,8 +219,9 @@ func NewClient(handler func([]byte)) *Client {
 	}
 }
 
-func NewOAuthClient(token *oauth.AccessToken, handler func([]byte)) *Client {
+func NewOAuthClient(consumer *oauth.Consumer, token *oauth.AccessToken, handler func([]byte)) *Client {
 	return &Client{
+		consumer:    consumer,
 		accessToken: token,
 		Handler:     handler,
 		MaxWait:     300,
