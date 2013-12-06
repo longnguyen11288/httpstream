@@ -42,26 +42,6 @@ func prettyJSON(js string) {
 	}
 }
 
-func TestNullableString(t *testing.T) {
-	m := make(map[string]StringNullable)
-	var valid bool
-	js := `{"url":"http:\/\/a0.twimg.com\/images\/themes\/theme14\/bg.gif"}`
-	if err := json.Unmarshal([]byte(js), &m); err == nil {
-		if string(m["url"]) == "http://a0.twimg.com/images/themes/theme14/bg.gif" {
-			valid = true
-		}
-	}
-	//Debug(m)
-	if !valid {
-		t.Fail()
-	}
-	m = make(map[string]StringNullable)
-	js = `{"url":null}`
-	if err := json.Unmarshal([]byte(js), &m); err != nil {
-		t.Fail()
-	}
-}
-
 func TestDecodeTweet1Test(t *testing.T) {
 	twlist := make([]Tweet, 0)
 	for i := 0; i < len(tweets); i++ {

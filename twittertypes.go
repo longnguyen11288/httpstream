@@ -7,22 +7,22 @@ import (
 )
 
 type User struct {
-	ID                        *Int64Nullable
-	IDStr                     StringNullable `json:"id_str"` // "id_str":"608729011",
+	ID                        *int64  `json:"id"`
+	IDStr                     *string `json:"id_str"` // "id_str":"608729011",
 	Name                      string
-	ScreenName                string         `json:"screen_name"`
-	ContributorsEnabled       bool           `json:"contributors_enabled"`
-	CreatedAt                 string         `json:"created_at"`
-	Description               StringNullable `json:"description"`
-	FavouritesCount           int            `json:"favourites_count"`
-	Followerscount            int            `json:"followers_count"`
-	Following                 *BoolNullable  // "following":null,
-	Friendscount              int            `json:"friends_count"`
+	ScreenName                string  `json:"screen_name"`
+	ContributorsEnabled       bool    `json:"contributors_enabled"`
+	CreatedAt                 string  `json:"created_at"`
+	Description               *string `json:"description"`
+	FavouritesCount           int     `json:"favourites_count"`
+	Followerscount            int     `json:"followers_count"`
+	Following                 *bool   // "following":null,
+	Friendscount              int     `json:"friends_count"`
 	GeoEnabled                bool
 	Lang                      string
-	Location                  StringNullable
-	ListedCount               int            `json:"listed_count"`
-	Notifications             StringNullable //"notifications":null,
+	Location                  *string
+	ListedCount               int     `json:"listed_count"`
+	Notifications             *string //"notifications":null,
 	ProfileTextColor          string
 	ProfileLinkColor          string
 	ProfileBackgroundImageURL string
@@ -33,11 +33,11 @@ type User struct {
 	ProfileBackgroundTile     bool
 	Protected                 bool
 	StatusesCount             int `json:"statuses_count"`
-	TimeZone                  StringNullable
-	URL                       StringNullable // "url":null
-	UtcOffset                 *IntNullable   // "utc_offset":null,
+	TimeZone                  *string
+	URL                       *string // "url":null
+	UtcOffset                 *int    // "utc_offset":null,
 	Verified                  bool
-	ShowAllInlineMedia        *BoolNullable `json:"show_all_inline_media"`
+	ShowAllInlineMedia        *bool `json:"show_all_inline_media"`
 	RawBytes                  []byte
 	//"default_profile":false,
 	//"follow_request_sent":null,
@@ -53,18 +53,18 @@ type Tweet struct {
 	Source              string
 	Contributors        []Contributor
 	Coordinates         *Coordinate
-	InReplyToScreenName StringNullable
-	InReplyToStatusID   *Int64Nullable
-	InReplyToUserID     *Int64Nullable
-	ID                  *Int64Nullable
+	InReplyToScreenName *string
+	InReplyToStatusID   *int64
+	InReplyToUserID     *int64
+	ID                  *int64
 	IDStr               string
 	CreatedAt           string
 	RetweetCount        int32
-	Retweeted           *BoolNullable
-	PossiblySensitive   *BoolNullable
+	Retweeted           *bool
+	PossiblySensitive   *bool
 	User                *User
 	RawBytes            []byte
-	Truncated           *BoolNullable
+	Truncated           *bool
 	Place               *Place // "place":null,
 	//Geo                     string   // deprecated
 	//RetweetedStatus         Tweet `json:"retweeted_status"`
@@ -74,8 +74,8 @@ func (t *Tweet) URLs() []string {
 	if len(t.Entities.URLs) > 0 {
 		urls := make([]string, 0)
 		for _, u := range t.Entities.URLs {
-			if len(string(u.ExpandedURL)) > 0 {
-				if eu, err := url.QueryUnescape(string(u.ExpandedURL)); err == nil {
+			if len(*u.ExpandedURL) > 0 {
+				if eu, err := url.QueryUnescape(*u.ExpandedURL); err == nil {
 					urls = append(urls, eu)
 				}
 			}
@@ -188,14 +188,14 @@ type Hashtag struct {
 //  "urls":[{"indices":[123,136],"url":"http:\/\/t.co\/a","display_url":null,"expanded_url":null}]
 type TwitterURL struct {
 	URL         string
-	ExpandedURL StringNullable // may be null
-	DisplayURL  StringNullable // may be null if it gets chopped off after t.co because of shortenring
+	ExpandedURL *string // may be null
+	DisplayURL  *string // may be null if it gets chopped off after t.co because of shortenring
 	Indices     []int
 }
 type Mention struct {
 	ScreenName string
-	Name       StringNullable // No idea why this could be null, if a username gets mentioned that doesn't exist?
-	ID         *Int64Nullable
+	Name       *string // No idea why this could be null, if a username gets mentioned that doesn't exist?
+	ID         *int64
 	IDStr      string
 	Indices    []int
 }
