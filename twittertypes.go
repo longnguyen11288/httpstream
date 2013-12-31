@@ -67,7 +67,7 @@ type Tweet struct {
 	Truncated               *BoolNullable
 	Place                   *Place // "place":null,
 	//Geo                     string   // deprecated
-	//RetweetedStatus         Tweet `json:"retweeted_status"`
+	RetweetedStatus         *Tweet `json:"retweeted_status"`
 }
 
 func (t *Tweet) Urls() []string {
