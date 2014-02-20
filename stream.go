@@ -1,11 +1,7 @@
-/*
-A Go http streaming client. http-streaming is most-associated with the twitter stream api.
-This client works with twitter, but has also been tested against the data-sift stream and
-flowdock stream api's
-
-httpstream was forked from https://github.com/hoisie/twitterstream
-
-*/
+// Package httpstream provides a generic HTTP streaming client.
+// HTTP streaming is most associated with the Twitter Stream API.
+// This client works with Twitter, but has also been tested against the data-sift stream
+// and flowdock stream APIs.
 package httpstream
 
 import (
@@ -14,7 +10,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"github.com/mrjones/oauth"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -25,12 +20,13 @@ import (
 )
 
 var (
-	filterUrl, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
-	sampleUrl, _                   = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
-	userUrl, _                     = url.Parse("https://userstream.twitter.com/2/user.json")
-	siteStreamUrl, _               = url.Parse("https://sitestream.twitter.com/2b/site.json")
-	retryTimeout     time.Duration = time.Second * 10
-	OauthCon         *oauth.Consumer
+	filterURL, _     = url.Parse("https://stream.twitter.com/1.1/statuses/filter.json")
+	sampleURL, _     = url.Parse("https://stream.twitter.com/1.1/statuses/sample.json")
+	userURL, _       = url.Parse("https://userstream.twitter.com/2/user.json")
+	siteStreamURL, _ = url.Parse("https://sitestream.twitter.com/2b/site.json")
+	retryTimeout     = time.Second * 10
+
+	ErrStaleConnection = errors.New("stale connection")
 )
 
 func init() {
@@ -38,14 +34,15 @@ func init() {
 }
 
 type streamConn struct {
-	client   *http.Client
-	resp     *http.Response
-	url      *url.URL
-	at       *oauth.AccessToken
-	authData string
-	postData string
-	stale    bool
-	closed   bool
+	c           *Client
+	client      *http.Client
+	resp        *http.Response
+	url         *url.URL
+	accessToken *oauth.AccessToken
+	authData    string
+	postData    string
+	stale       bool
+	closed      bool
 	// wait time before trying to reconnect, this will be
 	// exponentially moved up until reaching maxWait, when
 	// it will exit
@@ -54,14 +51,13 @@ type streamConn struct {
 	connect func() (*http.Response, error)
 }
 
+// NewStreamConn creates a new stream connection.
 func NewStreamConn(max int) streamConn {
 	return streamConn{wait: 1, maxWait: max}
 }
 
-//type StreamHandler func([]byte)
-
+// Connect will mark the connection as stale, and let the connect() handler close after a read.
 func (conn *streamConn) Close() {
-	// Just mark the connection as stale, and let the connect() handler close after a read
 	conn.stale = true
 	conn.closed = true
 	if conn.resp != nil {
@@ -69,53 +65,48 @@ func (conn *streamConn) Close() {
 	}
 }
 
-func basicauthConnect(conn *streamConn) (*http.Response, error) {
+// Connect using basic auth.
+func (conn *streamConn) basicauthConnect() (resp *http.Response, err error) {
 	if conn.stale {
-		return nil, errors.New("Stale connection")
+		err = ErrStaleConnection
+		return
 	}
 
 	conn.client = &http.Client{}
 
-	var req http.Request
-	req.URL = conn.url
-	req.Method = "GET"
-	req.Header = http.Header{}
+	req, _ := http.NewRequest("GET", conn.url.String(), nil)
 	if conn.authData != "" {
 		req.Header.Set("Authorization", conn.authData)
 	}
 
 	if conn.postData != "" {
-		req.Method = "POST"
-		req.Body = nopCloser{bytes.NewBufferString(conn.postData)}
+		req, _ = http.NewRequest("POST", conn.url.String(), bytes.NewBufferString(conn.postData))
 		req.ContentLength = int64(len(conn.postData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 	Debug(req.Header)
 	Debug(conn.postData)
-	resp, err := conn.client.Do(&req)
-
-	if err != nil {
+	if resp, err = conn.client.Do(req); err != nil {
 		Log(ERROR, "Could not Connect to Stream: ", err)
-		return nil, err
-	} else {
-		Debugf("connected to %s \n\thttp status = %v", conn.url, resp.Status)
-		Debug(resp.Header)
-		for n, v := range resp.Header {
-			Debug(n, v[0])
-		}
+		return
+	}
+	Debugf("connected to %s \n\thttp status = %v", conn.url, resp.Status)
+	Debug(resp.Header)
+	for n, v := range resp.Header {
+		Debug(n, v[0])
 	}
 
-	return resp, nil
+	return
 }
 
-func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, error) {
+// Connect using OAuth.
+func (conn *streamConn) oauthConnect(params map[string]string) (resp *http.Response, err error) {
 	if conn.stale {
-		return nil, errors.New("Stale connection")
+		err = ErrStaleConnection
+		return
 	}
 
-	resp, err := OauthCon.Post(conn.url.String(), params, conn.at)
-
-	if err != nil {
+	if resp, err = conn.c.consumer.Post(conn.url.String(), params, conn.accessToken); err != nil {
 		if resp != nil && resp.Body != nil {
 			data, _ := ioutil.ReadAll(resp.Body)
 			Log(ERROR, err, " ", string(data))
@@ -132,21 +123,18 @@ func oauthConnect(conn *streamConn, params map[string]string) (*http.Response, e
 		}
 	}
 
-	return resp, nil
+	return
 }
 
 func formString(params map[string]string) string {
-	var body bytes.Buffer
+	var vals url.Values
 	for k, v := range params {
-		body.WriteString(URLEscape(k))
-		body.WriteString("=")
-		body.WriteString(URLEscape(v))
-		body.WriteString("&")
+		vals.Add(k, v)
 	}
-	return body.String()
+	return vals.Encode()
 }
 
-func (conn *streamConn) readStream(resp *http.Response, handler func([]byte), uniqueId string, done chan bool) {
+func (conn *streamConn) readStream(resp *http.Response, handler func([]byte), uniqueID string, done chan bool) {
 
 	var reader *bufio.Reader
 	reader = bufio.NewReader(resp.Body)
@@ -211,28 +199,17 @@ func encodedAuth(user, pwd string) string {
 	return buf.String()
 }
 
-type nopCloser struct {
-	io.Reader
-}
-
-func (nopCloser) Close() error {
-	return nil
-}
-
-func getNopCloser(buf *bytes.Buffer) nopCloser {
-	return nopCloser{buf}
-}
-
 // Client for connecting
 type Client struct {
 	Username string
 	Password string
 	// unique id for this connection
-	Uniqueid string
-	conn     *streamConn
-	MaxWait  int
-	at       *oauth.AccessToken
-	Handler  func([]byte)
+	Uniqueid    string
+	conn        *streamConn
+	consumer    *oauth.Consumer
+	MaxWait     int
+	accessToken *oauth.AccessToken
+	Handler     func([]byte)
 }
 
 func NewClient(handler func([]byte)) *Client {
@@ -242,11 +219,12 @@ func NewClient(handler func([]byte)) *Client {
 	}
 }
 
-func NewOAuthClient(at *oauth.AccessToken, handler func([]byte)) *Client {
+func NewOAuthClient(consumer *oauth.Consumer, token *oauth.AccessToken, handler func([]byte)) *Client {
 	return &Client{
-		at:      at,
-		Handler: handler,
-		MaxWait: 300,
+		consumer:    consumer,
+		accessToken: token,
+		Handler:     handler,
+		MaxWait:     300,
 	}
 }
 
@@ -290,13 +268,13 @@ func (c *Client) Connect(url_ *url.URL, params map[string]string, done chan bool
 		sc.postData = formString(params)
 		sc.authData = "Basic " + encodedAuth(c.Username, c.Password)
 		sc.connect = func() (*http.Response, error) {
-			return basicauthConnect(&sc)
+			return sc.basicauthConnect()
 		}
 
 	} else {
-		sc.at = c.at
+		sc.accessToken = c.accessToken
 		sc.connect = func() (*http.Response, error) {
-			return oauthConnect(&sc, params)
+			return sc.oauthConnect(params)
 		}
 
 	}
@@ -367,14 +345,14 @@ func (c *Client) Filter(userids []int64, topics []string, languages []string, lo
 	}
 
 	if watchStalls {
-		c.Handler = StallWatcher(c.Handler)
+		c.Handler = stallWatcher(c.Handler)
 	}
 
-	return c.Connect(filterUrl, params, done)
+	return c.Connect(filterURL, params, done)
 }
 
-// a handler wrapper to watch for twitter stall warnings
-func StallWatcher(handler func([]byte)) func([]byte) {
+// A handler wrapper to watch for twitter stall wardings.
+func stallWatcher(handler func([]byte)) func([]byte) {
 	/*
 		{ "warning":{
 			"code":"FALLING_BEHIND",
@@ -396,17 +374,19 @@ func StallWatcher(handler func([]byte)) func([]byte) {
 	}
 }
 
-// twitter sample stream
+// Sample connects to the Twitter Sample stream.
+// https://dev.twitter.com/docs/api/1.1/get/statuses/sample
 func (c *Client) Sample(done chan bool) error {
-	return c.Connect(sampleUrl, nil, done)
+	return c.Connect(sampleURL, nil, done)
 }
 
-// Track User tweets and events, uses passed username/pwd
+// User connects to the Twitter User stream.
+// https://dev.twitter.com/docs/streaming-apis/streams/user
 func (c *Client) User(done chan bool) error {
-	return c.Connect(userUrl, nil, done)
+	return c.Connect(userURL, nil, done)
 }
 
-// Close the client
+// Close closes the client.
 func (c *Client) Close() {
 	//has it already been closed?
 	if c.conn == nil || c.conn.stale {

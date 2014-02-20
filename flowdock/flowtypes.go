@@ -1,8 +1,6 @@
 package flowdock
 
-
-import (
-)
+import ()
 
 /*
 {"event":"message","tags":[],"uuid":"SSlxf45-xxe","id":111,"flow":"example:main",
@@ -35,12 +33,12 @@ There is a periodic heartbeat per user it looks like
 
 */
 
-type struct Event {
+type Event struct {
 	// "mail", "activity.user",
-	Event       string   
-	Tags        []string
-	Uuid        string
-	Id          int
-	Flow        string
-	Content     interface{}
+	Event   string
+	Tags    []string
+	Uuid    string
+	ID      int
+	Flow    string
+	Content interface{}
 }

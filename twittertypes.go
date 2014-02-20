@@ -1,44 +1,44 @@
 package httpstream
 
 import (
-	"bytes"
 	//"encoding/json"
 	"net/url"
+	"regexp"
 )
 
 type User struct {
-	Id                           *Int64Nullable
-	Id_str                       StringNullable `json:"id_str"` // "id_str":"608729011",
-	Name                         string
-	ScreenName                   string         `json:"screen_name"`
-	ContributorsEnabled          bool           `json:"contributors_enabled"`
-	CreatedAt                    string         `json:"created_at"`
-	Description                  StringNullable `json:"description"`
-	FavouritesCount              int            `json:"favourites_count"`
-	Followerscount               int            `json:"followers_count"`
-	Following                    *BoolNullable  // "following":null,
-	Friendscount                 int            `json:"friends_count"`
-	Geo_enabled                  bool
-	Lang                         string
-	Location                     StringNullable
-	Listed_count                 int            `json:"listed_count"`
-	Notifications                StringNullable //"notifications":null,
-	Profile_text_color           string
-	Profile_link_color           string
-	Profile_background_image_url string
-	Profile_background_color     string
-	Profile_sidebar_fill_color   string
-	Profile_image_url            string
-	Profile_sidebar_border_color string
-	Profile_background_tile      bool
-	Protected                    bool
-	Statuses_Count               int `json:"statuses_count"`
-	Time_zone                    StringNullable
-	Url                          StringNullable // "url":null
-	Utc_offset                   *IntNullable   // "utc_offset":null,
-	Verified                     bool
-	ShowAllInlineMedia           *BoolNullable `json:"show_all_inline_media"`
-	RawBytes                     []byte
+	ID                        *int64  `json:"id"`
+	IDStr                     *string `json:"id_str"` // "id_str":"608729011",
+	Name                      string
+	ScreenName                string  `json:"screen_name"`
+	ContributorsEnabled       bool    `json:"contributors_enabled"`
+	CreatedAt                 string  `json:"created_at"`
+	Description               *string `json:"description"`
+	FavouritesCount           int     `json:"favourites_count"`
+	Followerscount            int     `json:"followers_count"`
+	Following                 *bool   // "following":null,
+	Friendscount              int     `json:"friends_count"`
+	GeoEnabled                bool
+	Lang                      string
+	Location                  *string
+	ListedCount               int     `json:"listed_count"`
+	Notifications             *string //"notifications":null,
+	ProfileTextColor          string
+	ProfileLinkColor          string
+	ProfileBackgroundImageURL string
+	ProfileBackgroundColor    string
+	ProfileSidebarFillColor   string
+	ProfileImageURL           string
+	ProfileSidebarBorderColor string
+	ProfileBackgroundTile     bool
+	Protected                 bool
+	StatusesCount             int `json:"statuses_count"`
+	TimeZone                  *string
+	URL                       *string // "url":null
+	UtcOffset                 *int    // "utc_offset":null,
+	Verified                  bool
+	ShowAllInlineMedia        *bool `json:"show_all_inline_media"`
+	RawBytes                  []byte
 	//"default_profile":false,
 	//"follow_request_sent":null,
 	//"is_translator":false,
@@ -47,35 +47,35 @@ type User struct {
 }
 
 type Tweet struct {
-	Text                    string
-	Entities                Entity
-	Favorited               bool
-	Source                  string
-	Contributors            []Contributor
-	Coordinates             *Coordinate
-	In_reply_to_screen_name StringNullable
-	In_reply_to_status_id   *Int64Nullable
-	In_reply_to_user_id     *Int64Nullable
-	Id                      *Int64Nullable
-	Id_str                  string
-	Created_at              string
-	Retweet_Count           int32
-	Retweeted               *BoolNullable
-	Possibly_Sensitive      *BoolNullable
-	User                    *User
-	RawBytes                []byte
-	Truncated               *BoolNullable
-	Place                   *Place // "place":null,
+	Text                string
+	Entities            Entity
+	Favorited           bool
+	Source              string
+	Contributors        []Contributor
+	Coordinates         *Coordinate
+	InReplyToScreenName *string
+	InReplyToStatusID   *int64
+	InReplyToUserID     *int64
+	ID                  *int64
+	IDStr               string
+	CreatedAt           string
+	RetweetCount        int32
+	Retweeted           *bool
+	PossiblySensitive   *bool
+	User                *User
+	RawBytes            []byte
+	Truncated           *bool
+	Place               *Place // "place":null,
 	//Geo                     string   // deprecated
 	RetweetedStatus         *Tweet `json:"retweeted_status"`
 }
 
-func (t *Tweet) Urls() []string {
-	if len(t.Entities.Urls) > 0 {
+func (t *Tweet) URLs() []string {
+	if len(t.Entities.URLs) > 0 {
 		urls := make([]string, 0)
-		for _, u := range t.Entities.Urls {
-			if len(string(u.Expanded_url)) > 0 {
-				if eu, err := url.QueryUnescape(string(u.Expanded_url)); err == nil {
+		for _, u := range t.Entities.URLs {
+			if len(*u.ExpandedURL) > 0 {
+				if eu, err := url.QueryUnescape(*u.ExpandedURL); err == nil {
 					urls = append(urls, eu)
 				}
 			}
@@ -98,10 +98,10 @@ func (t *Tweet) Hashes() []string {
 
 // Return a list of usernames found in the tweet entity mentions
 func (t *Tweet) Mentions() []string {
-	if len(t.Entities.User_mentions) > 0 {
+	if len(t.Entities.UserMentions) > 0 {
 		users := make([]string, 0)
-		for _, m := range t.Entities.User_mentions {
-			users = append(users, m.Screen_name)
+		for _, m := range t.Entities.UserMentions {
+			users = append(users, m.ScreenName)
 		}
 		return users
 	}
@@ -120,11 +120,11 @@ type Place struct {
 	Bounding    BoundingBox `json:"bounding_box"`
 	Country     string      `json:"country"`
 	CountryCode string      `json:"country_code"`
-	Id          string      `json:"id"`
+	ID          string      `json:"id"`
 	Name        string      `json:"name"`
 	FullName    string      `json:"full_name"`
 	PlaceType   string      `json:"place_type"`
-	Url         string      `json:"url"`
+	URL         string      `json:"url"`
 }
 
 // Location bounding box of coordinates
@@ -155,28 +155,28 @@ func (c *Coordinate) UnmarshalJSON(data []byte) error {
 }
 */
 type Contributor struct {
-	Id          int64
-	Id_str      string
-	Screen_name string
+	ID         int64
+	IDStr      string
+	ScreenName string
 }
 
 type SiteStreamMessage struct {
-	For_user int64
-	Message  Tweet
+	ForUser int64
+	Message Tweet
 }
 
 type Event struct {
-	Target     User
-	Source     User
-	Created_at string
-	Event      string
+	Target    User
+	Source    User
+	CreatedAt string
+	Event     string
 }
 
 type Entity struct {
-	Hashtags      []Hashtag
-	Urls          []TwitterUrl
-	User_mentions []Mention
-	Media         []Media
+	Hashtags     []Hashtag
+	URLs         []TwitterURL
+	UserMentions []Mention
+	Media        []Media
 }
 
 type Hashtag struct {
@@ -186,32 +186,32 @@ type Hashtag struct {
 
 // A twitter url
 //  "urls":[{"indices":[123,136],"url":"http:\/\/t.co\/a","display_url":null,"expanded_url":null}]
-type TwitterUrl struct {
-	Url          string
-	Expanded_url StringNullable // may be null
-	Display_url  StringNullable // may be null if it gets chopped off after t.co because of shortenring
-	Indices      []int
+type TwitterURL struct {
+	URL         string
+	ExpandedURL *string // may be null
+	DisplayURL  *string // may be null if it gets chopped off after t.co because of shortenring
+	Indices     []int
 }
 type Mention struct {
-	Screen_name string
-	Name        StringNullable // No idea why this could be null, if a username gets mentioned that doesn't exist?
-	Id          *Int64Nullable
-	Id_str      string
-	Indices     []int
+	ScreenName string
+	Name       *string // No idea why this could be null, if a username gets mentioned that doesn't exist?
+	ID         *int64
+	IDStr      string
+	Indices    []int
 }
 
 type Media struct {
-	Id              int64
-	Id_str          string
-	Display_url     string
-	Expanded_url    string
-	Indices         []int
-	Media_url       string
-	Media_url_https string
-	Url             string
-	Type            string
-	Screen_name     string
-	Sizes           Sizes
+	ID            int64
+	IDStr         string
+	DisplayURL    string
+	ExpandedURL   string
+	Indices       []int
+	MediaURL      string
+	MediaURLHTTPS string
+	URL           string
+	Type          string
+	ScreenName    string
+	Sizes         Sizes
 }
 
 type Sizes struct {
@@ -245,9 +245,9 @@ The twitter stream contains non-tweets (deletes)
 */
 // a function to filter out the delete messages
 func OnlyTweetsFilter(handler func([]byte)) func([]byte) {
-	delTw := []byte(`{"delete"`)
+	delTw := regexp.MustCompile(`{"delete":`)
 	return func(line []byte) {
-		if !bytes.HasPrefix(line, delTw) {
+		if delTw.Find(line) != nil {
 			handler(line)
 		}
 	}

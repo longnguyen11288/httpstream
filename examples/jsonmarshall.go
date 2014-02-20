@@ -12,17 +12,17 @@ import (
 )
 
 var (
-	pwd      *string = flag.String("pwd", "password", "Twitter Password")
-	user     *string = flag.String("user", "username", "Twitter username")
-	track    *string = flag.String("track", "", "Twitter terms to track")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	pwd      = flag.String("pwd", "password", "Twitter Password")
+	user     = flag.String("user", "username", "Twitter username")
+	track    = flag.String("track", "", "Twitter terms to track")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func printPretty(tweet *httpstream.Tweet) {
 	b, err := json.MarshalIndent(tweet, " ", "   ")
 	if err == nil && tweet.Place != nil {
 		println(string(b))
-		//log.Println(tweet.Urls())
+		//log.Println(tweet.URLs())
 	}
 }
 func printPrettyBytes(line []byte) {
@@ -52,7 +52,7 @@ func HandleLine(th int, line []byte) {
 		json.Unmarshal(line, &tweet)
 		printPretty(&tweet)
 		//if tweet.Coordinates != nil {
-		//println(th, " ", tweet.User.Screen_name, ": ", tweet.Text)
+		//println(th, " ", tweet.User.ScreenName, ": ", tweet.Text)
 		//	printPretty(tweet)
 		//}
 	}

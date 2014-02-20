@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	pwd      *string = flag.String("pwd", "password", "Password")
-	user     *string = flag.String("user", "username", "username")
-	track    *string = flag.String("track", "", "Twitter terms to track")
-	logLevel *string = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
+	pwd      = flag.String("pwd", "password", "Password")
+	user     = flag.String("user", "username", "username")
+	track    = flag.String("track", "", "Twitter terms to track")
+	logLevel = flag.String("logging", "debug", "Which log level: [debug,info,warn,error,fatal]")
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 		stream <- line
 		// although you can do heavy lifting here, it means you are doing all
 		// your work in the same thread as the http streaming/listener
-		// by using a go channel, you can send the work to a 
+		// by using a go channel, you can send the work to a
 		// different thread/goroutine
 	}))
 
